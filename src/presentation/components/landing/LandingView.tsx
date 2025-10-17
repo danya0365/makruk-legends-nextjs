@@ -85,68 +85,97 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
   const hero = viewModel.hero;
 
   return (
-    <div className="space-y-24">
-      <section className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1 text-sm font-semibold text-primary">
-              {hero.subtitle}
-            </span>
-            <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              {hero.title}
-            </h1>
-            <p className="text-lg text-muted-foreground sm:text-xl">{hero.description}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              href={hero.primaryCta.href}
-              className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
-            >
-              {hero.primaryCta.label}
-            </Link>
-            <Link
-              href={hero.secondaryCta.href}
-              className="rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary"
-            >
-              {hero.secondaryCta.label}
-            </Link>
-          </div>
-          <dl className="grid gap-6 sm:grid-cols-3">
-            {hero.stats.map((stat) => (
-              <div key={stat.label} className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur">
-                <dt className="text-sm text-muted-foreground">{stat.label}</dt>
-                <dd className="mt-2 text-3xl font-bold text-foreground">{stat.value}</dd>
-                <p className="text-xs text-muted-foreground">{stat.subLabel}</p>
-              </div>
-            ))}
-          </dl>
+    <div className="flex flex-col gap-24 sm:gap-28">
+      <section className="relative overflow-hidden rounded-[2.75rem] border border-border/50 bg-gradient-to-br from-background via-background/70 to-background/30 px-6 py-14 shadow-2xl shadow-primary/5 sm:px-12 sm:py-20">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-24 top-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full bg-primary/15 blur-3xl" />
+          <div className="absolute right-[-15%] top-[-20%] h-[30rem] w-[30rem] rounded-full bg-purple-500/20 blur-3xl" />
+          <div className="absolute bottom-[-30%] left-1/2 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[180px]" />
         </div>
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10" />
-          <div className="relative space-y-6 p-8">
-            <SectionHeader
-              eyebrow="LIVE ARENA"
-              title="Featured Showdowns"
-              description="ติดตามการแข่งขันระดับตำนานและแมตช์พิเศษที่คัดสรรเพื่อคุณ"
-            />
-            <ul className="space-y-4">
-              {featuredTournaments.map((tournament) => (
-                <li
-                  key={tournament.id}
-                  className="flex items-center justify-between rounded-2xl border border-border/60 bg-background/60 px-4 py-3"
+        <div className="relative grid gap-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div className="space-y-10">
+            <div className="max-w-xl space-y-5">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                <span className="inline-flex h-2.5 w-2.5 animate-pulse rounded-full bg-primary" />
+                {hero.subtitle}
+              </span>
+              <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                {hero.title}
+              </h1>
+              <p className="text-lg text-muted-foreground sm:text-xl">{hero.description}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <Link
+                href={hero.primaryCta.href}
+                className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-purple-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition hover:shadow-xl"
+              >
+                <span>{hero.primaryCta.label}</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </Link>
+              <Link
+                href={hero.secondaryCta.href}
+                className="inline-flex items-center gap-2 rounded-full border border-border/70 px-7 py-3 text-sm font-semibold text-foreground transition hover:border-primary/60 hover:text-primary"
+              >
+                {hero.secondaryCta.label}
+              </Link>
+            </div>
+            <dl className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {hero.stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="relative overflow-hidden rounded-[1.75rem] border border-border/60 bg-card/70 p-6 shadow-md backdrop-blur"
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{tournament.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {tournament.format} · {tournament.timeControl}
-                    </p>
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10" />
+                  <div className="relative space-y-2">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{stat.label}</dt>
+                    <dd className="text-3xl font-bold text-foreground sm:text-4xl">{stat.value}</dd>
+                    <p className="text-xs text-muted-foreground/90">{stat.subLabel}</p>
                   </div>
-                  <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                    {tournament.status === "registration" ? "เปิดรับสมัคร" : tournament.status === "live" ? "ถ่ายทอดสด" : "สิ้นสุดแล้ว"}
-                  </span>
-                </li>
+                </div>
               ))}
-            </ul>
+            </dl>
+          </div>
+          <div className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card/80 shadow-2xl shadow-primary/10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.3),_transparent_60%)]" />
+            <div className="relative space-y-6 p-8">
+              <SectionHeader
+                eyebrow="LIVE ARENA"
+                title="Featured Showdowns"
+                description="ติดตามการแข่งขันระดับตำนานและแมตช์พิเศษที่คัดสรรเพื่อคุณ"
+              />
+              <ul className="space-y-4">
+                {featuredTournaments.map((tournament) => (
+                  <li
+                    key={tournament.id}
+                    className="flex items-center justify-between gap-6 rounded-3xl border border-border/50 bg-background/70 px-5 py-4 shadow-sm transition hover:border-primary/50 hover:bg-background/80"
+                  >
+                    <div className="space-y-1.5">
+                      <p className="text-sm font-semibold text-foreground">{tournament.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {tournament.format} · {tournament.timeControl}
+                      </p>
+                    </div>
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
+                        tournament.status === "registration"
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : tournament.status === "live"
+                            ? "bg-orange-500/10 text-orange-400"
+                            : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {tournament.status === "registration"
+                        ? "เปิดรับสมัคร"
+                        : tournament.status === "live"
+                          ? "ถ่ายทอดสด"
+                          : "สิ้นสุดแล้ว"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -158,17 +187,20 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           description="ระบบการเล่น การเรียนรู้ และชุมชนครบถ้วนทัดเทียมแพลตฟอร์มระดับโลก"
           align="center"
         />
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {viewModel.highlights.map((highlight) => {
             const Icon = highlightIcons[highlight.icon as keyof typeof highlightIcons] ?? Trophy;
             return (
               <div
                 key={highlight.id}
-                className="group rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
+                className="group relative overflow-hidden rounded-[2rem] border border-border/50 bg-card/70 p-6 shadow-md transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-2xl"
               >
-                <Icon className="h-10 w-10 text-primary" />
-                <h3 className="mt-4 text-xl font-semibold text-foreground">{highlight.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{highlight.description}</p>
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-purple-500/10 opacity-0 transition group-hover:opacity-100" />
+                <div className="relative space-y-3">
+                  <Icon className="h-10 w-10 text-primary" />
+                  <h3 className="text-xl font-semibold text-foreground">{highlight.title}</h3>
+                  <p className="text-sm text-muted-foreground">{highlight.description}</p>
+                </div>
               </div>
             );
           })}
@@ -186,7 +218,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <select
               value={filters.region}
               onChange={(event) => actions.setRegion(event.target.value as LandingRegionFilter)}
-              className="rounded-full border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm"
+              className="rounded-full border border-border/50 bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-primary/50"
             >
               {regionOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -197,7 +229,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <select
               value={filters.tournamentStatus}
               onChange={(event) => actions.setTournamentStatus(event.target.value as TournamentStatusFilter)}
-              className="rounded-full border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm"
+              className="rounded-full border border-border/50 bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-primary/50"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -209,8 +241,10 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               type="button"
               onClick={actions.toggleFeatured}
               className={cn(
-                "rounded-full border border-border/70 px-4 py-2 text-sm font-medium transition",
-                filters.showOnlyFeatured ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground",
+                "rounded-full border border-border/50 px-4 py-2 text-sm font-medium transition",
+                filters.showOnlyFeatured
+                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               แสดงเฉพาะ Featured
@@ -218,21 +252,21 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <button
               type="button"
               onClick={actions.resetFilters}
-              className="rounded-full border border-border/60 px-4 py-2 text-sm text-muted-foreground transition hover:border-primary/60 hover:text-primary"
+              className="rounded-full border border-border/50 px-4 py-2 text-sm text-muted-foreground transition hover:border-primary/60 hover:text-primary"
             >
               รีเซ็ต
             </button>
           </div>
         </div>
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-5 lg:grid-cols-2">
           {filteredTournaments.map((tournament) => (
             <article
               key={tournament.id}
-              className="flex flex-col justify-between rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
+              className="flex flex-col justify-between rounded-[2.25rem] border border-border/50 bg-card/80 p-6 shadow-md transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-2xl"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                  <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
                     {tournament.format}
                   </span>
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -245,12 +279,12 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 <h3 className="text-2xl font-semibold text-foreground">{tournament.name}</h3>
                 <p className="text-sm text-muted-foreground">{tournament.description}</p>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                  <span className="rounded-full bg-muted px-3 py-1">{tournament.timeControl}</span>
-                  <span className="rounded-full bg-muted px-3 py-1">{tournament.prizePool}</span>
-                  <span className="rounded-full bg-muted px-3 py-1">
+                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.timeControl}</span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.prizePool}</span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">
                     {tournament.registeredPlayers}/{tournament.playerCap} Players
                   </span>
-                  <span className="rounded-full bg-muted px-3 py-1">{tournament.region.toUpperCase()}</span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.region.toUpperCase()}</span>
                 </div>
               </div>
               <div className="mt-6 flex items-center justify-between">
@@ -267,7 +301,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </article>
           ))}
           {filteredTournaments.length === 0 ? (
-            <div className="col-span-full rounded-3xl border border-dashed border-border/70 p-12 text-center text-muted-foreground">
+            <div className="col-span-full rounded-[2.25rem] border border-dashed border-border/60 bg-card/60 p-12 text-center text-muted-foreground">
               ไม่พบการแข่งขันที่ตรงกับตัวกรองของคุณ
             </div>
           ) : null}
@@ -280,7 +314,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           title="Top 5 ผู้เล่นที่ฮอตที่สุด"
           description="ติดตามอันดับ Elo และสถิติการชนะของผู้เล่นที่โดดเด่นในแต่ละซีซั่น"
         />
-        <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/60 shadow-sm">
+        <div className="overflow-hidden rounded-[2.25rem] border border-border/50 bg-card/80 shadow-lg">
           <table className="w-full text-left text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
@@ -294,7 +328,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </thead>
             <tbody>
               {topLeaders.map((leader) => (
-                <tr key={leader.id} className="border-t border-border/50">
+                <tr key={leader.id} className="border-t border-border/40">
                   <td className="px-6 py-4 text-base font-semibold text-foreground">#{leader.rank}</td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-foreground">{leader.playerName}</div>
@@ -318,16 +352,16 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             title="ชุมชนหมากรุกไทยที่เติบโตเร็วที่สุด"
             description="แลกเปลี่ยน วิเคราะห์ และเติบโตไปพร้อมกับผู้เล่นแนวหน้าจากทั่วทุกมุมโลก"
           />
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             {(["all", "forum", "live", "learning"] as const).map((category) => (
               <button
                 key={category}
                 type="button"
                 onClick={() => actions.setCommunityCategory(category)}
                 className={cn(
-                  "rounded-full border border-border/70 px-4 py-2 text-sm font-medium capitalize transition",
+                  "rounded-full border border-border/50 px-4 py-2 text-sm font-medium capitalize transition",
                   filters.activeCommunityCategory === category
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-primary bg-primary/10 text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -336,11 +370,11 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             ))}
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {trendingCommunities.map((community) => (
             <article
               key={community.id}
-              className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
+              className="rounded-[2rem] border border-border/50 bg-card/70 p-6 shadow-md transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-2xl"
             >
               <h3 className="text-xl font-semibold text-foreground">{community.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{community.description}</p>
@@ -366,11 +400,11 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           description="ประสบการณ์จริงจากนักแข่ง โค้ช และผู้นำคอมมูนิตี้"
           align="center"
         />
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {viewModel.testimonials.map((testimonial) => (
             <figure
               key={testimonial.id}
-              className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm"
+              className="rounded-[2rem] border border-border/50 bg-card/70 p-6 shadow-md"
             >
               <div className="flex items-center gap-3">
                 <div className="relative h-12 w-12 overflow-hidden rounded-full">
@@ -400,21 +434,21 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           align="center"
         />
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm">
+          <div className="rounded-[2.25rem] border border-border/50 bg-card/70 p-6 shadow-md">
             <h3 className="text-lg font-semibold text-foreground">พันธมิตร</h3>
             <div className="mt-4 flex flex-wrap items-center gap-6">
               {viewModel.partners.map((partner) => (
                 <Link
                   key={partner.id}
                   href={partner.url}
-                  className="flex h-16 w-32 items-center justify-center rounded-2xl border border-border/40 bg-background/40 p-4 text-sm font-semibold text-muted-foreground transition hover:border-primary/60 hover:text-primary"
+                  className="flex h-16 w-32 items-center justify-center rounded-2xl border border-border/40 bg-background/60 p-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition hover:border-primary/60 hover:text-primary"
                 >
                   {partner.name}
                 </Link>
               ))}
             </div>
           </div>
-          <div className="rounded-3xl border border-border/60 bg-card/60 p-6 shadow-sm">
+          <div className="rounded-[2.25rem] border border-border/50 bg-card/70 p-6 shadow-md">
             <h3 className="text-lg font-semibold text-foreground">ข้อมูลเชิงลึก</h3>
             <ul className="mt-4 space-y-3">
               {viewModel.insights.map((insight) => (

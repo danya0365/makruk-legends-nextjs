@@ -12,54 +12,65 @@ interface MainLayoutProps extends PropsWithChildren {
 
 export function MainLayout({ children, className }: MainLayoutProps) {
   return (
-    <div className={cn("min-h-screen bg-background text-foreground", className)}>
-      <header className="border-b border-border bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/40">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <span className="rounded bg-primary px-2 py-1 text-primary-foreground">ML</span>
-            <span>Makruk Legends</span>
+    <div className={cn("relative min-h-screen overflow-hidden bg-background text-foreground", className)}>
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-[-30%] h-[42rem] w-[42rem] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute bottom-[-25%] right-[-10%] h-[38rem] w-[38rem] rounded-full bg-purple-500/15 blur-3xl" />
+        <div className="absolute left-[-10%] top-1/3 h-[32rem] w-[32rem] rounded-full bg-sky-500/10 blur-3xl" />
+      </div>
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+          <Link href="/" className="flex items-center gap-2 text-base font-semibold tracking-tight sm:text-lg">
+            <span className="rounded-full border border-primary/40 bg-primary/15 px-2 py-1 text-xs font-bold uppercase text-primary shadow-sm">
+              ML
+            </span>
+            <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
+              Makruk Legends
+            </span>
           </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium text-muted-foreground">
-            <Link href="#features" className="transition hover:text-primary">
+          <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground lg:flex">
+            <Link href="#features" className="transition hover:text-foreground">
               Features
             </Link>
-            <Link href="#tournaments" className="transition hover:text-primary">
+            <Link href="#tournaments" className="transition hover:text-foreground">
               Tournaments
             </Link>
-            <Link href="#community" className="transition hover:text-primary">
-              Community
-            </Link>
-            <Link href="#leaderboard" className="transition hover:text-primary">
+            <Link href="#leaderboard" className="transition hover:text-foreground">
               Leaderboard
             </Link>
+            <Link href="#community" className="transition hover:text-foreground">
+              Community
+            </Link>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <Link
               href="/auth/login"
-              className="rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-primary hover:text-primary"
+              className="rounded-full border border-border/70 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition hover:border-primary/60 hover:text-primary"
             >
               Sign In
             </Link>
             <Link
               href="/auth/register"
-              className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
+              className="hidden rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground shadow-lg transition hover:shadow-xl sm:block"
             >
               Join Now
             </Link>
           </div>
         </div>
       </header>
-      <main className="mx-auto min-h-[calc(100vh-12rem)] max-w-6xl px-6 py-10">{children}</main>
-      <footer className="border-t border-border bg-card/70 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="font-semibold text-foreground">Makruk Legends</p>
-            <p className="mt-1 max-w-xl">
-              Competitive Makruk platform featuring global tournaments, ranked ladder, and a vibrant community hub for Thai chess enthusiasts.
+      <main className="mx-auto flex min-h-[calc(100vh-12rem)] max-w-7xl flex-col gap-20 px-6 pb-24 pt-16 sm:gap-24 sm:pt-24">
+        {children}
+      </main>
+      <footer className="border-t border-border/60 bg-background/80 py-10 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <p className="text-lg font-semibold text-foreground">Makruk Legends</p>
+            <p className="max-w-xl text-sm">
+              แพลตฟอร์มหมากรุกไทยครบวงจรสำหรับผู้เล่นทุกระดับ พร้อมการแข่งขันระดับโลก ชุมชนคุณภาพ และเครื่องมือพัฒนาฝีมือแบบครบครัน
             </p>
           </div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-5">
             <Link href="/terms" className="transition hover:text-primary">
               Terms
             </Link>
@@ -68,6 +79,9 @@ export function MainLayout({ children, className }: MainLayoutProps) {
             </Link>
             <Link href="/support" className="transition hover:text-primary">
               Support
+            </Link>
+            <Link href="/press" className="transition hover:text-primary">
+              Press
             </Link>
           </div>
         </div>

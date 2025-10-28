@@ -1,13 +1,16 @@
 "use client";
 
+import { Flame, GraduationCap, LineChart, Trophy, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Flame, GraduationCap, LineChart, Trophy, Users } from "lucide-react";
 
 import type { LandingMasterData } from "@/src/domain/models/landing";
 import { SectionHeader } from "@/src/presentation/components/molecules/section/SectionHeader";
 import { useLandingPresenter } from "@/src/presentation/presenters/landing/useLandingPresenter";
-import type { LandingRegionFilter, TournamentStatusFilter } from "@/src/presentation/stores/landingStore";
+import type {
+  LandingRegionFilter,
+  TournamentStatusFilter,
+} from "@/src/presentation/stores/landingStore";
 import { cn } from "@/src/utils/cn";
 
 const highlightIcons = {
@@ -54,7 +57,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="space-y-3 text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">กำลังโหลดข้อมูล Makruk Legends...</p>
+          <p className="text-muted-foreground">
+            กำลังโหลดข้อมูล Makruk Legends...
+          </p>
         </div>
       </div>
     );
@@ -64,7 +69,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="max-w-md space-y-4 text-center">
-          <h1 className="text-2xl font-semibold text-foreground">เกิดข้อผิดพลาด</h1>
+          <h1 className="text-2xl font-semibold text-foreground">
+            เกิดข้อผิดพลาด
+          </h1>
           <p className="text-muted-foreground">{error}</p>
           <button
             type="button"
@@ -85,7 +92,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
   const hero = viewModel.hero;
 
   return (
-    <div className="flex flex-col gap-24 sm:gap-28">
+    <div className="flex flex-col gap-24 sm:gap-28 container">
       <section className="relative overflow-hidden rounded-[2.75rem] border border-border/50 bg-gradient-to-br from-background via-background/70 to-background/30 px-6 py-14 shadow-2xl shadow-primary/5 sm:px-12 sm:py-20">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute -left-24 top-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full bg-primary/15 blur-3xl" />
@@ -102,7 +109,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               <h1 className="text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 {hero.title}
               </h1>
-              <p className="text-lg text-muted-foreground sm:text-xl">{hero.description}</p>
+              <p className="text-lg text-muted-foreground sm:text-xl">
+                {hero.description}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <Link
@@ -110,7 +119,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-purple-500 px-7 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition hover:shadow-xl"
               >
                 <span>{hero.primaryCta.label}</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
+                <span className="transition-transform group-hover:translate-x-1">
+                  →
+                </span>
               </Link>
               <Link
                 href={hero.secondaryCta.href}
@@ -127,9 +138,15 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10" />
                   <div className="relative space-y-2">
-                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{stat.label}</dt>
-                    <dd className="text-3xl font-bold text-foreground sm:text-4xl">{stat.value}</dd>
-                    <p className="text-xs text-muted-foreground/90">{stat.subLabel}</p>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {stat.label}
+                    </dt>
+                    <dd className="text-3xl font-bold text-foreground sm:text-4xl">
+                      {stat.value}
+                    </dd>
+                    <p className="text-xs text-muted-foreground/90">
+                      {stat.subLabel}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -150,7 +167,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                     className="flex items-center justify-between gap-6 rounded-3xl border border-border/50 bg-background/70 px-5 py-4 shadow-sm transition hover:border-primary/50 hover:bg-background/80"
                   >
                     <div className="space-y-1.5">
-                      <p className="text-sm font-semibold text-foreground">{tournament.name}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {tournament.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {tournament.format} · {tournament.timeControl}
                       </p>
@@ -161,16 +180,16 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                         tournament.status === "registration"
                           ? "bg-emerald-500/10 text-emerald-400"
                           : tournament.status === "live"
-                            ? "bg-orange-500/10 text-orange-400"
-                            : "bg-muted text-muted-foreground",
+                          ? "bg-orange-500/10 text-orange-400"
+                          : "bg-muted text-muted-foreground"
                       )}
                     >
                       <span className="h-1.5 w-1.5 rounded-full bg-current" />
                       {tournament.status === "registration"
                         ? "เปิดรับสมัคร"
                         : tournament.status === "live"
-                          ? "ถ่ายทอดสด"
-                          : "สิ้นสุดแล้ว"}
+                        ? "ถ่ายทอดสด"
+                        : "สิ้นสุดแล้ว"}
                     </span>
                   </li>
                 ))}
@@ -189,7 +208,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
         />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {viewModel.highlights.map((highlight) => {
-            const Icon = highlightIcons[highlight.icon as keyof typeof highlightIcons] ?? Trophy;
+            const Icon =
+              highlightIcons[highlight.icon as keyof typeof highlightIcons] ??
+              Trophy;
             return (
               <div
                 key={highlight.id}
@@ -198,8 +219,12 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-purple-500/10 opacity-0 transition group-hover:opacity-100" />
                 <div className="relative space-y-3">
                   <Icon className="h-10 w-10 text-primary" />
-                  <h3 className="text-xl font-semibold text-foreground">{highlight.title}</h3>
-                  <p className="text-sm text-muted-foreground">{highlight.description}</p>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {highlight.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {highlight.description}
+                  </p>
                 </div>
               </div>
             );
@@ -217,7 +242,9 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
           <div className="flex flex-wrap gap-3">
             <select
               value={filters.region}
-              onChange={(event) => actions.setRegion(event.target.value as LandingRegionFilter)}
+              onChange={(event) =>
+                actions.setRegion(event.target.value as LandingRegionFilter)
+              }
               className="rounded-full border border-border/50 bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-primary/50"
             >
               {regionOptions.map((option) => (
@@ -228,7 +255,11 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </select>
             <select
               value={filters.tournamentStatus}
-              onChange={(event) => actions.setTournamentStatus(event.target.value as TournamentStatusFilter)}
+              onChange={(event) =>
+                actions.setTournamentStatus(
+                  event.target.value as TournamentStatusFilter
+                )
+              }
               className="rounded-full border border-border/50 bg-background/80 px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-primary/50"
             >
               {statusOptions.map((option) => (
@@ -244,7 +275,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                 "rounded-full border border-border/50 px-4 py-2 text-sm font-medium transition",
                 filters.showOnlyFeatured
                   ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               แสดงเฉพาะ Featured
@@ -276,26 +307,44 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                     }).format(new Date(tournament.startDate))}
                   </span>
                 </div>
-                <h3 className="text-2xl font-semibold text-foreground">{tournament.name}</h3>
-                <p className="text-sm text-muted-foreground">{tournament.description}</p>
+                <h3 className="text-2xl font-semibold text-foreground">
+                  {tournament.name}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {tournament.description}
+                </p>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.timeControl}</span>
-                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.prizePool}</span>
                   <span className="rounded-full bg-muted/70 px-3 py-1">
-                    {tournament.registeredPlayers}/{tournament.playerCap} Players
+                    {tournament.timeControl}
                   </span>
-                  <span className="rounded-full bg-muted/70 px-3 py-1">{tournament.region.toUpperCase()}</span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">
+                    {tournament.prizePool}
+                  </span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">
+                    {tournament.registeredPlayers}/{tournament.playerCap}{" "}
+                    Players
+                  </span>
+                  <span className="rounded-full bg-muted/70 px-3 py-1">
+                    {tournament.region.toUpperCase()}
+                  </span>
                 </div>
               </div>
               <div className="mt-6 flex items-center justify-between">
-                <Link href={`/tournaments/${tournament.id}`} className="text-sm font-semibold text-primary hover:underline">
+                <Link
+                  href={`/tournaments/${tournament.id}`}
+                  className="text-sm font-semibold text-primary hover:underline"
+                >
                   รายละเอียดการแข่งขัน
                 </Link>
                 <button
                   type="button"
                   className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
                 >
-                  {tournament.status === "registration" ? "สมัครเข้าร่วม" : tournament.status === "live" ? "รับชมสด" : "ดูสรุปผล"}
+                  {tournament.status === "registration"
+                    ? "สมัครเข้าร่วม"
+                    : tournament.status === "live"
+                    ? "รับชมสด"
+                    : "ดูสรุปผล"}
                 </button>
               </div>
             </article>
@@ -329,15 +378,27 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             <tbody>
               {topLeaders.map((leader) => (
                 <tr key={leader.id} className="border-t border-border/40">
-                  <td className="px-6 py-4 text-base font-semibold text-foreground">#{leader.rank}</td>
+                  <td className="px-6 py-4 text-base font-semibold text-foreground">
+                    #{leader.rank}
+                  </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium text-foreground">{leader.playerName}</div>
-                    <div className="text-xs text-muted-foreground">ประเทศ {leader.country}</div>
+                    <div className="font-medium text-foreground">
+                      {leader.playerName}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      ประเทศ {leader.country}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-foreground">{leader.rating}</td>
-                  <td className="px-6 py-4 text-foreground">{leader.winRate}%</td>
-                  <td className="px-6 py-4 text-foreground">{leader.streak} W</td>
-                  <td className="px-6 py-4 text-foreground">{leader.region.toUpperCase()}</td>
+                  <td className="px-6 py-4 text-foreground">
+                    {leader.winRate}%
+                  </td>
+                  <td className="px-6 py-4 text-foreground">
+                    {leader.streak} W
+                  </td>
+                  <td className="px-6 py-4 text-foreground">
+                    {leader.region.toUpperCase()}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -362,7 +423,7 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                   "rounded-full border border-border/50 px-4 py-2 text-sm font-medium capitalize transition",
                   filters.activeCommunityCategory === category
                     ? "border-primary bg-primary/10 text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {category === "all" ? "ทั้งหมด" : category}
@@ -376,8 +437,12 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
               key={community.id}
               className="rounded-[2rem] border border-border/50 bg-card/70 p-6 shadow-md transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-2xl"
             >
-              <h3 className="text-xl font-semibold text-foreground">{community.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{community.description}</p>
+              <h3 className="text-xl font-semibold text-foreground">
+                {community.title}
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {community.description}
+              </p>
               <dl className="mt-4 space-y-1 text-xs text-muted-foreground">
                 <div className="flex justify-between">
                   <dt>สมาชิก</dt>
@@ -416,11 +481,17 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                   />
                 </div>
                 <div>
-                  <figcaption className="text-sm font-semibold text-foreground">{testimonial.name}</figcaption>
-                  <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                  <figcaption className="text-sm font-semibold text-foreground">
+                    {testimonial.name}
+                  </figcaption>
+                  <p className="text-xs text-muted-foreground">
+                    {testimonial.role}
+                  </p>
                 </div>
               </div>
-              <blockquote className="mt-4 text-sm text-muted-foreground">“{testimonial.quote}”</blockquote>
+              <blockquote className="mt-4 text-sm text-muted-foreground">
+                “{testimonial.quote}”
+              </blockquote>
             </figure>
           ))}
         </div>
@@ -449,13 +520,22 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
             </div>
           </div>
           <div className="rounded-[2.25rem] border border-border/50 bg-card/70 p-6 shadow-md">
-            <h3 className="text-lg font-semibold text-foreground">ข้อมูลเชิงลึก</h3>
+            <h3 className="text-lg font-semibold text-foreground">
+              ข้อมูลเชิงลึก
+            </h3>
             <ul className="mt-4 space-y-3">
               {viewModel.insights.map((insight) => (
-                <li key={insight.id} className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3">
+                <li
+                  key={insight.id}
+                  className="flex items-center justify-between rounded-2xl bg-muted/40 px-4 py-3"
+                >
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{insight.label}</p>
-                    <p className="text-xs text-muted-foreground">{insight.change}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {insight.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {insight.change}
+                    </p>
                   </div>
                   <span
                     className={cn(
@@ -463,8 +543,8 @@ export function LandingView({ initialViewModel }: LandingViewProps) {
                       insight.trend === "up"
                         ? "text-emerald-500"
                         : insight.trend === "down"
-                          ? "text-red-500"
-                          : "text-muted-foreground",
+                        ? "text-red-500"
+                        : "text-muted-foreground"
                     )}
                   >
                     {insight.value}

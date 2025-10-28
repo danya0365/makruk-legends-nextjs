@@ -125,7 +125,7 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
               ส่งลิงก์ให้เพื่อนและเล่นด้วยกัน
             </p>
             <Link
-              href="/game"
+              href="/game/create-room"
               className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               สร้างห้อง

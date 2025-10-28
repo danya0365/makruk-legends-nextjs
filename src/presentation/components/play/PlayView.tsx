@@ -82,7 +82,7 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
             {viewModel.gameModes.map((mode) => (
               <Link
                 key={mode.id}
-                href={`/play/${mode.id}`}
+                href="/game"
                 className="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 border border-gray-200 dark:border-gray-700"
               >
                 <div className="text-5xl mb-4">{mode.icon}</div>
@@ -144,7 +144,7 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
               ฝึกฝนกับ AI ได้หลายระดับ
             </p>
             <Link
-              href="/play/ai"
+              href="/game"
               className="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
             >
               เริ่มเล่น

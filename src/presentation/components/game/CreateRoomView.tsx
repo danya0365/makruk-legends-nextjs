@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Clock, ArrowRight, Sparkles } from "lucide-react";
+import { supabaseClient } from "@/src/infrastructure/supabase/client";
 
 export function CreateRoomView() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export function CreateRoomView() {
     return roomId;
   };
 
-  const handleCreateRoom = () => {
+  const handleCreateRoom = async () => {
     if (!playerName.trim()) {
       alert("กรุณาใส่ชื่อของคุณ");
       return;
@@ -29,21 +30,62 @@ export function CreateRoomView() {
 
     setIsCreating(true);
 
-    // Simulate room creation
-    setTimeout(() => {
+    try {
       const roomId = generateRoomId();
-      
-      // Store player info in localStorage
-      localStorage.setItem(`room_${roomId}_host`, JSON.stringify({
+      const hostId = `host_${Date.now()}`;
+
+      // Create room in Supabase database
+      const { error: createError } = await supabaseClient
+        .from("game_rooms")
+        .insert({
+          id: roomId,
+          host_id: hostId,
+          host_name: playerName,
+          host_user_id: null, // NULL for guest, UUID for logged-in user
+          guest_id: null,
+          guest_name: null,
+          guest_user_id: null,
+          time_control: timeControl,
+          is_private: isPrivate,
+          status: "waiting",
+          game_state: {
+            fen: "rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1",
+            turn: "white",
+            moveCount: 0,
+            check: false,
+            checkmate: false,
+            stalemate: false,
+          },
+          winner: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          started_at: null,
+          finished_at: null,
+        } as never);
+
+      if (createError) {
+        console.error("Error creating room in database:", createError);
+        alert("เกิดข้อผิดพลาดในการสร้างห้อง: " + createError.message);
+        setIsCreating(false);
+        return;
+      }
+
+      // Store player info in localStorage for client-side
+      localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
+        id: hostId,
         name: playerName,
+        isHost: true,
         timeControl,
-        isPrivate,
-        createdAt: new Date().toISOString(),
+        joinedAt: new Date().toISOString(),
       }));
 
       // Navigate to room
-      router.push(`/game/room/${roomId}`);
-    }, 500);
+      router.push(`/game/room/${roomId}?host=true&hostId=${hostId}&hostName=${encodeURIComponent(playerName)}&timeControl=${timeControl}`);
+    } catch (error) {
+      console.error("Error creating room:", error);
+      alert("เกิดข้อผิดพลาดในการสร้างห้อง");
+      setIsCreating(false);
+    }
   };
 
   return (

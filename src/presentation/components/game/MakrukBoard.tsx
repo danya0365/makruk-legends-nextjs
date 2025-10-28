@@ -5,7 +5,16 @@ import { MakrukPiece } from "./MakrukPiece";
 import { Position } from "@/src/domain/types/game.types";
 import { positionsEqual } from "@/src/utils/game-engine";
 
-export function MakrukBoard() {
+interface MakrukBoardProps {
+  onMove?: (
+    from: { row: number; col: number },
+    to: { row: number; col: number },
+    piece: { type: string; color: string }
+  ) => void;
+  myColor?: "white" | "black" | null;
+}
+
+export function MakrukBoard({ onMove, myColor }: MakrukBoardProps = {}) {
   const {
     board,
     selectedPiece,
@@ -19,6 +28,15 @@ export function MakrukBoard() {
     const piece = board[row][col];
     const clickedPosition: Position = { row, col };
 
+    // TURN LOCK: If myColor is set (multiplayer), only allow moves on YOUR turn
+    const isMyTurn = !myColor || currentTurn === myColor;
+    
+    // Early return if not your turn
+    if (!isMyTurn) {
+      console.log(`⛔ Not your turn! Current: ${currentTurn}, You: ${myColor}`);
+      return;
+    }
+
     if (selectedPiece) {
       // If a piece is selected, try to move it
       const isValidMove = validMoves.some((move) =>
@@ -26,7 +44,19 @@ export function MakrukBoard() {
       );
 
       if (isValidMove) {
+        // Move piece locally
         movePiece(selectedPiece.position, clickedPosition);
+        
+        console.log(`✅ Moved ${selectedPiece.type} from (${selectedPiece.position.row},${selectedPiece.position.col}) to (${row},${col})`);
+        
+        // Notify parent about the move (for multiplayer)
+        if (onMove) {
+          onMove(
+            selectedPiece.position,
+            clickedPosition,
+            { type: selectedPiece.type, color: selectedPiece.color }
+          );
+        }
       } else if (piece && piece.color === currentTurn) {
         // Select different piece of same color
         selectPiece(piece);
@@ -35,8 +65,9 @@ export function MakrukBoard() {
         selectPiece(null);
       }
     } else if (piece && piece.color === currentTurn) {
-      // Select piece
+      // Select piece (only if it's your color and your turn)
       selectPiece(piece);
+      console.log(`🎯 Selected ${piece.type} at (${row},${col})`);
     }
   };
 

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Copy, Check, Users, Link as LinkIcon, Crown, AlertCircle } from "lucide-react";
 import { GameView } from "./GameView";
+import { useRealtimeGame } from "@/src/presentation/hooks/useRealtimeGame";
 
 interface RoomGameViewProps {
   roomId: string;
@@ -11,25 +12,134 @@ interface RoomGameViewProps {
 
 export function RoomGameView({ roomId }: RoomGameViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [playerName, setPlayerName] = useState("");
+  const [playerId, setPlayerId] = useState("");
   const [showJoinForm, setShowJoinForm] = useState(true);
-  const [roomInfo, setRoomInfo] = useState<{
-    name: string;
-    timeControl: string;
-    isPrivate: boolean;
-    createdAt: string;
-  } | null>(null);
   const [copied, setCopied] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [myColor, setMyColor] = useState<"white" | "black" | null>(null);
+  const [role, setRole] = useState<"host" | "guest" | "spectator" | null>(null);
+  const [spectatorMessage, setSpectatorMessage] = useState<string | null>(null);
 
+  // Check if user is host from URL params
   useEffect(() => {
-    // Load room info from localStorage
-    const hostInfo = localStorage.getItem(`room_${roomId}_host`);
-    
-    if (hostInfo) {
-      setRoomInfo(JSON.parse(hostInfo));
+    const isHostParam = searchParams.get("host") === "true";
+    const hostId = searchParams.get("hostId");
+    const hostName = searchParams.get("hostName");
+    const timeControl = searchParams.get("timeControl");
+
+    if (isHostParam && hostId && hostName) {
+      const decodedHostName = decodeURIComponent(hostName);
+      setIsHost(true);
+      setPlayerId(hostId);
+      setPlayerName(decodedHostName);
+      setMyColor("white"); // Host เล่นขาว
+      setRole("host");
+      setSpectatorMessage(null);
+
+      // Auto-join if host
+      setShowJoinForm(false);
+
+      // Store player info
+      localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
+        id: hostId,
+        name: decodedHostName,
+        isHost: true,
+        role: "host",
+        color: "white",
+        timeControl,
+      }));
+    } else {
+      // Try to load from localStorage
+      const stored = localStorage.getItem(`room_${roomId}_player`);
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as {
+            id?: string;
+            name?: string;
+            isHost?: boolean;
+            role?: "host" | "guest" | "spectator";
+            color?: "white" | "black";
+          };
+
+          if (data?.name) {
+            if (data.id) {
+              setPlayerId(data.id);
+            }
+            setPlayerName(data.name);
+            setIsHost(Boolean(data.isHost));
+
+            const storedRole: "host" | "guest" | "spectator" =
+              data.role ?? (data.isHost ? "host" : "guest");
+            setRole(storedRole);
+
+            if (storedRole === "host") {
+              setMyColor("white");
+              setSpectatorMessage(null);
+              setShowJoinForm(false);
+            } else if (storedRole === "guest") {
+              setMyColor(data.color ?? "black");
+              setSpectatorMessage(null);
+              setShowJoinForm(false);
+            } else if (storedRole === "spectator") {
+              setMyColor(null);
+              setSpectatorMessage(
+                "ผู้เล่นทั้งสองฝั่งกำลังเล่นอยู่ คุณสามารถรับชมเกมได้แบบเรียลไทม์"
+              );
+              setShowJoinForm(false);
+            }
+          }
+        } catch (error) {
+          console.warn("Failed to parse stored player info", error);
+          localStorage.removeItem(`room_${roomId}_player`);
+        }
+      }
     }
-  }, [roomId]);
+  }, [roomId, searchParams]);
+
+  // Initialize Realtime (use stable IDs to prevent re-initialization)
+  const stablePlayerId = playerId || "temp_guest";
+  const stablePlayerName = playerId && role !== "spectator" ? playerName : "Guest";
+  
+  const {
+    connected,
+    loading: realtimeLoading,
+    error: realtimeError,
+    gameRoom,
+    players,
+    joinAsGuest,
+  } = useRealtimeGame({
+    roomId,
+    playerId: stablePlayerId,
+    playerName: stablePlayerName,
+  });
+
+  // Update role when room data changes (e.g., refresh or new guest joins)
+  useEffect(() => {
+    if (!gameRoom) {
+      return;
+    }
+
+    if (gameRoom.host_id === playerId) {
+      setRole("host");
+      setSpectatorMessage(null);
+      return;
+    }
+
+    if (gameRoom.guest_id === playerId) {
+      setRole("guest");
+      setSpectatorMessage(null);
+      return;
+    }
+
+    if (gameRoom.guest_id) {
+      setRole("spectator");
+      setSpectatorMessage("ผู้เล่นทั้งสองฝั่งกำลังเล่นอยู่ คุณสามารถรับชมเกมได้แบบเรียลไทม์");
+      setMyColor(null);
+      return;
+    }
+  }, [gameRoom, playerId]);
 
   const roomUrl = typeof window !== "undefined" 
     ? `${window.location.origin}/game/room/${roomId}`
@@ -41,32 +151,71 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     if (!playerName.trim()) {
       alert("กรุณาใส่ชื่อของคุณ");
       return;
     }
 
-    // Check if user is host
-    const hostInfo = localStorage.getItem(`room_${roomId}_host`);
-    if (hostInfo) {
-      const host = JSON.parse(hostInfo);
-      if (host.name === playerName) {
-        setIsHost(true);
+    try {
+      const guestId = `guest_${Date.now()}`;
+
+      // Guest ALWAYS plays as BLACK
+      const playerColor: "white" | "black" = "black";
+
+      // Guest joins the room
+      const joined = await joinAsGuest({ id: guestId, name: playerName });
+
+      if (!joined) {
+        const spectatorId = `spectator_${Date.now()}`;
+        setRole("spectator");
+        setPlayerId(spectatorId);
+        setMyColor(null);
+        setSpectatorMessage("ผู้เล่นทั้งสองฝั่งถูกจับจองแล้ว คุณกำลังชมเป็นผู้สังเกตการณ์");
+        localStorage.setItem(
+          `room_${roomId}_player`,
+          JSON.stringify({
+            id: spectatorId,
+            name: playerName,
+            role: "spectator",
+            isHost: false,
+          })
+        );
+        setShowJoinForm(false);
+        return;
       }
+
+      setPlayerId(guestId);
+      setMyColor(playerColor);
+      setIsHost(false);
+      setRole("guest");
+      setSpectatorMessage(null);
+
+      // Store player info
+      localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
+        id: guestId,
+        name: playerName,
+        isHost: false,
+        role: "guest",
+        color: playerColor,
+        joinedAt: new Date().toISOString(),
+      }));
+
+      console.log(`✅ Guest joined as BLACK: ${playerName} (${guestId})`);
+      setShowJoinForm(false);
+    } catch (error) {
+      console.error("Error joining room:", error);
+      alert("เกิดข้อผิดพลาดในการเข้าร่วมห้อง");
     }
-
-    // Store player info
-    localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
-      name: playerName,
-      joinedAt: new Date().toISOString(),
-    }));
-
-    setShowJoinForm(false);
   };
 
   // If already in game, show game view
   if (!showJoinForm) {
+    const isSpectator = role === "spectator";
+    const effectivePlayerId = isSpectator ? "spectator" : playerId;
+    const effectivePlayerName = isSpectator ? playerName || "Spectator" : playerName;
+    const effectiveColor = isSpectator ? null : myColor;
+
     return (
       <>
         {/* Room Info Bar */}
@@ -101,11 +250,61 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
           </button>
         </div>
 
+        {/* Connection Status */}
+        {!connected && (
+          <div className="absolute top-28 right-6 px-4 py-2 bg-yellow-500 text-yellow-900 rounded-lg shadow-lg text-sm font-medium animate-pulse">
+            ⚠️ กำลังเชื่อมต่อ...
+          </div>
+        )}
+
+        {/* Players Info */}
+        <div className="absolute top-28 left-6 space-y-2 z-40">
+          {/* Players Count */}
+          <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm">
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-blue-600" />
+              <span className="font-semibold">{players.length}/2 ผู้เล่น</span>
+            </div>
+          </div>
+
+          {/* Match Info - ALWAYS SHOW */}
+          <div className="px-4 py-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm space-y-2">
+            <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
+              <span className="font-semibold">⚪ ขาว:</span>
+              <span className="font-medium">{gameRoom?.host_name || "Host"}</span>
+              {isHost && <Crown className="h-3 w-3 text-yellow-500" />}
+            </div>
+            <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
+              <span className="font-semibold">⚫ ดำ:</span>
+              <span className="font-medium">
+                {players.length > 1 
+                  ? players.find(p => p.id !== gameRoom?.host_id)?.name || playerName
+                  : !isHost ? playerName : "รอผู้เล่น..."}
+              </span>
+              {!isHost && <span className="text-xs">(คุณ)</span>}
+            </div>
+            <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
+                คุณเล่นเป็น: {isHost ? "⚪ ขาว (เดินก่อน)" : "⚫ ดำ (เดินทีสอง)"}
+              </span>
+            </div>
+          </div>
+          {spectatorMessage && (
+            <div className="px-4 py-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg shadow-lg text-xs text-yellow-800 dark:text-yellow-200">
+              👀 {spectatorMessage}
+            </div>
+          )}
+        </div>
+
         {/* Game View with offset */}
         <div className="pt-12">
           <GameView
+            roomId={roomId}
+            playerId={effectivePlayerId}
+            playerName={effectivePlayerName}
+            myColor={effectiveColor}
             config={{
-              timeControl: roomInfo?.timeControl || "10+0",
+              timeControl: gameRoom?.time_control || "10+0",
               mode: "online",
             }}
           />
@@ -143,7 +342,13 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
       {/* Content */}
       <div className="absolute inset-0 flex items-center justify-center pt-16">
         <div className="w-full max-w-2xl mx-4">
-          {!roomInfo ? (
+          {realtimeLoading ? (
+            /* Loading Room */
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">กำลังโหลดห้องเกม...</p>
+            </div>
+          ) : realtimeError || !gameRoom ? (
             /* Room Not Found */
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
               <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -170,7 +375,7 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
                   <h2 className="text-3xl font-bold">เข้าร่วมห้อง</h2>
                 </div>
                 <p className="text-green-100">
-                  ห้องของ <strong>{roomInfo.name}</strong>
+                  ห้องของ <strong>{gameRoom.host_name}</strong>
                 </p>
               </div>
 
@@ -191,7 +396,7 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
                       ระยะเวลา
                     </p>
                     <p className="text-xl font-bold text-gray-900 dark:text-white">
-                      {roomInfo.timeControl === "unlimited" ? "♾️ ไม่จำกัด" : `⏱️ ${roomInfo.timeControl}`}
+                      {gameRoom.time_control === "unlimited" ? "♾️ ไม่จำกัด" : `⏱️ ${gameRoom.time_control}`}
                     </p>
                   </div>
                 </div>

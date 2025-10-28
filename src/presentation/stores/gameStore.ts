@@ -24,6 +24,8 @@ interface GameActions {
   initializeGame: (config: GameConfig) => void;
   selectPiece: (piece: Piece | null) => void;
   movePiece: (from: Position, to: Position) => void;
+  applyOpponentMove: (from: Position, to: Position) => void;
+  syncBoardState: (board: (Piece | null)[][], currentTurn: PieceColor) => void;
   resetGame: () => void;
   resignGame: (color: PieceColor) => void;
   offerDraw: () => void;
@@ -51,7 +53,7 @@ const initialState: GameState = {
 export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
-  initializeGame: (config: GameConfig) => {
+  initializeGame: (_config: GameConfig) => {
     set({
       ...initialState,
       board: initializeBoard(),
@@ -142,6 +144,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
       moveHistory: newMoveHistory,
       status: newStatus,
       result: newResult,
+    });
+  },
+
+  applyOpponentMove: (from: Position, to: Position) => {
+    const { board, capturedPieces, moveHistory } = get();
+
+    // Get the piece at 'from' position
+    const movingPiece = board[from.row][from.col];
+    if (!movingPiece) return;
+
+    // Make the move (opponent's move)
+    const { newBoard, capturedPiece } = makeMove(board, from, to);
+
+    // Update captured pieces
+    const newCapturedPieces = { ...capturedPieces };
+    if (capturedPiece) {
+      if (capturedPiece.color === "white") {
+        newCapturedPieces.white.push(capturedPiece);
+      } else {
+        newCapturedPieces.black.push(capturedPiece);
+      }
+    }
+
+    // Create move record
+    const move: Move = {
+      from,
+      to,
+      piece: movingPiece,
+      capturedPiece: capturedPiece || undefined,
+      timestamp: new Date(),
+    };
+
+    const newMoveHistory = [...moveHistory, move];
+
+    // Switch turn back to us
+    const nextTurn: PieceColor = movingPiece.color === "white" ? "black" : "white";
+
+    // Check game state
+    let newStatus: GameStatus = "playing";
+    let newResult: GameResult = null;
+
+    if (isCheckmate(newBoard, nextTurn)) {
+      newStatus = "finished";
+      newResult = movingPiece.color === "white" ? "white-win" : "black-win";
+    } else if (isKingInCheck(newBoard, nextTurn)) {
+      console.log(`${nextTurn} king is in check!`);
+    }
+
+    set({
+      board: newBoard,
+      currentTurn: nextTurn,
+      selectedPiece: null,
+      validMoves: [],
+      capturedPieces: newCapturedPieces,
+      moveHistory: newMoveHistory,
+      status: newStatus,
+      result: newResult,
+    });
+  },
+
+  syncBoardState: (board: (Piece | null)[][], currentTurn: PieceColor) => {
+    set({
+      board,
+      currentTurn,
+      status: "playing",
+      selectedPiece: null,
+      validMoves: [],
     });
   },
 

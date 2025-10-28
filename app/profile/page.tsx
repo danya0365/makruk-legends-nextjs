@@ -1,5 +1,5 @@
-import { LandingView } from "@/src/presentation/components/landing/LandingView";
-import { LandingPresenterFactory } from "@/src/presentation/presenters/landing/LandingPresenter";
+import { ProfileView } from "@/src/presentation/components/profile/ProfileView";
+import { ProfilePresenterFactory } from "@/src/presentation/presenters/profile/ProfilePresenter";
 import { MainLayout } from "@/src/presentation/components/layout/MainLayout";
 import type { Metadata } from "next";
 
@@ -11,7 +11,7 @@ export const fetchCache = "force-no-store";
  * Generate metadata for the page
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const presenter = await LandingPresenterFactory.createServer();
+  const presenter = await ProfilePresenterFactory.createServer();
 
   try {
     return await presenter.generateMetadata();
@@ -20,30 +20,30 @@ export async function generateMetadata(): Promise<Metadata> {
 
     // Fallback metadata
     return {
-      title: "Makruk Legends - หมากรุกไทยออนไลน์",
-      description: "เล่นหมากรุกไทยออนไลน์ แข่งขันทัวร์นาเม้นต์ระดับโลก",
+      title: "โปรไฟล์ | Makruk Legends",
+      description: "ดูโปรไฟล์และสถิติของผู้เล่น",
     };
   }
 }
 
 /**
- * Landing page - Server Component for SEO optimization
+ * Profile page - Server Component for SEO optimization
  * Uses presenter pattern following Clean Architecture
  */
-export default async function LandingPage() {
-  const presenter = await LandingPresenterFactory.createServer();
+export default async function ProfilePage() {
+  const presenter = await ProfilePresenterFactory.createServer();
 
   try {
-    // Get view model from presenter
-    const viewModel = await presenter.getViewModel();
+    // Get view model from presenter (user will be loaded client-side)
+    const viewModel = await presenter.getViewModel(null);
 
     return (
       <MainLayout>
-        <LandingView initialViewModel={viewModel} />
+        <ProfileView initialViewModel={viewModel} />
       </MainLayout>
     );
   } catch (error) {
-    console.error("Error fetching landing data:", error);
+    console.error("Error fetching profile data:", error);
 
     // Fallback UI
     return (
@@ -53,7 +53,7 @@ export default async function LandingPage() {
             <h1 className="text-2xl font-bold text-foreground mb-2">
               เกิดข้อผิดพลาด
             </h1>
-            <p className="text-muted mb-4">ไม่สามารถโหลดข้อมูลหน้าแรกได้</p>
+            <p className="text-muted mb-4">ไม่สามารถโหลดข้อมูลโปรไฟล์ได้</p>
           </div>
         </div>
       </MainLayout>

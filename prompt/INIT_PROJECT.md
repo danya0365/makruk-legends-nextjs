@@ -14,7 +14,7 @@
 
 และอยากให้คุณใส่ option จัดเต็ม ตามเว็บแข่งแข่งขันออไลน์ระดับโลกเขาทำกัน
 
-โดยทุกครั้งที่สร้าง page.tsx ต้องทำตาม rule ที่เขียนไว้ที่ /Users/marosdeeuma/work-pulse-nextjs/prompt/CREATE_PAGE_PATTERN.md
+โดยทุกครั้งที่สร้าง page.tsx ต้องทำตาม rule ที่เขียนไว้ที่ /Users/marosdeeuma/makruk-legends-nextjs/prompt/CREATE_PAGE_PATTERN.md
 
 ถ้าหาก TODO มีเนื้อหาเยอะเกินไป ให้เขียนแยก TODO_FEATURES ออกมา
 
@@ -23,14 +23,3 @@
 แล้วจากนั้น สร้างหน้า MainLayout พร้อม Header Footer และใส่ Theme Toggle
 
 จากนั้นสร้างหน้า Landing พร้อม master data และ mock data ที่จะใช้ใน หน้า landing ได้เลย
-
-- copy prompt ที่มีอยู่ใน timeluxe-nextjs
-- อัพเดต package.json
-- อัพเดต landing page
-- อัพเดต layout
-- create tailwind cn utility
-- copy env
-- init supabase
-- copy supabase migrations and seeds
-- copy public ที่มีอยู่ใน timeluxe-nextjs
-- gen Logo แล้วสร้าง favicon

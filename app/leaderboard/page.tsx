@@ -1,5 +1,5 @@
-import { LandingView } from "@/src/presentation/components/landing/LandingView";
-import { LandingPresenterFactory } from "@/src/presentation/presenters/landing/LandingPresenter";
+import { LeaderboardView } from "@/src/presentation/components/leaderboard/LeaderboardView";
+import { LeaderboardPresenterFactory } from "@/src/presentation/presenters/leaderboard/LeaderboardPresenter";
 import { MainLayout } from "@/src/presentation/components/layout/MainLayout";
 import type { Metadata } from "next";
 
@@ -11,7 +11,7 @@ export const fetchCache = "force-no-store";
  * Generate metadata for the page
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const presenter = await LandingPresenterFactory.createServer();
+  const presenter = await LeaderboardPresenterFactory.createServer();
 
   try {
     return await presenter.generateMetadata();
@@ -20,18 +20,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
     // Fallback metadata
     return {
-      title: "Makruk Legends - หมากรุกไทยออนไลน์",
-      description: "เล่นหมากรุกไทยออนไลน์ แข่งขันทัวร์นาเม้นต์ระดับโลก",
+      title: "อันดับผู้เล่น | Makruk Legends",
+      description: "ติดตามอันดับและคะแนนของผู้เล่นหมากรุกไทยออนไลน์",
     };
   }
 }
 
 /**
- * Landing page - Server Component for SEO optimization
+ * Leaderboard page - Server Component for SEO optimization
  * Uses presenter pattern following Clean Architecture
  */
-export default async function LandingPage() {
-  const presenter = await LandingPresenterFactory.createServer();
+export default async function LeaderboardPage() {
+  const presenter = await LeaderboardPresenterFactory.createServer();
 
   try {
     // Get view model from presenter
@@ -39,11 +39,11 @@ export default async function LandingPage() {
 
     return (
       <MainLayout>
-        <LandingView initialViewModel={viewModel} />
+        <LeaderboardView initialViewModel={viewModel} />
       </MainLayout>
     );
   } catch (error) {
-    console.error("Error fetching landing data:", error);
+    console.error("Error fetching leaderboard data:", error);
 
     // Fallback UI
     return (
@@ -53,7 +53,7 @@ export default async function LandingPage() {
             <h1 className="text-2xl font-bold text-foreground mb-2">
               เกิดข้อผิดพลาด
             </h1>
-            <p className="text-muted mb-4">ไม่สามารถโหลดข้อมูลหน้าแรกได้</p>
+            <p className="text-muted mb-4">ไม่สามารถโหลดข้อมูลอันดับได้</p>
           </div>
         </div>
       </MainLayout>

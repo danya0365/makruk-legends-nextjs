@@ -51,9 +51,10 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {viewModel.quickPlayOptions.map((option) => (
-              <button
+              <Link
                 key={option.id}
-                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-left"
+                href="/game"
+                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-8 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 text-left block"
               >
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors"></div>
                 <div className="relative z-10">
@@ -62,11 +63,12 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
                     {option.name}
                   </h3>
                   <p className="text-blue-100 mb-4">{option.description}</p>
-                  <div className="flex items-center text-white/90">
+                  <div className="flex items-center justify-between text-white/90">
                     <span className="text-sm">⏱️ {option.timeControl}</span>
+                    <span className="text-sm font-semibold">เล่นเลย →</span>
                   </div>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -122,9 +124,12 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               ส่งลิงก์ให้เพื่อนและเล่นด้วยกัน
             </p>
-            <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            <Link
+              href="/game"
+              className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
               สร้างห้อง
-            </button>
+            </Link>
           </div>
 
           {/* Play vs Computer */}
@@ -157,9 +162,12 @@ export function PlayView({ initialViewModel }: PlayViewProps) {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               หาคู่แข่งที่มีคะแนนใกล้เคียง
             </p>
-            <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+            <Link
+              href="/game"
+              className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
               ค้นหาคู่แข่ง
-            </button>
+            </Link>
           </div>
         </div>
 

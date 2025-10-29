@@ -231,28 +231,62 @@ export function GameView({
     console.error("Realtime error:", error);
   }
 
+  const isStandalone = layout === "standalone";
+
   const containerClass = cn(
     "flex flex-col w-full bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden",
-    layout === "standalone" ? "absolute inset-0" : "relative h-full min-h-full",
+    isStandalone
+      ? "absolute inset-0 min-h-screen"
+      : "relative h-full min-h-full",
     className
   );
 
   const topBarClass = cn(
-    "left-0 right-0 h-16 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-20",
-    layout === "standalone" ? "absolute top-0" : "relative w-full"
+    "left-0 right-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-20",
+    isStandalone ? "absolute top-0" : "relative w-full"
   );
 
   const boardWrapperClass = cn(
-    "flex flex-1 items-center justify-center",
-    layout === "standalone" && showTopBar ? "pt-16 pb-4" : "py-4"
+    "flex flex-1 items-center justify-center px-2 sm:px-4 md:px-0",
+    isStandalone && showTopBar ? "pt-[7.5rem] md:pt-20 pb-4" : "py-4"
+  );
+
+  const topBarContentClass = cn(
+    "w-full h-full px-4 md:px-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-4 md:py-0",
+    isStandalone ? "md:h-16" : ""
+  );
+
+  const topBarStatsClass = cn(
+    "flex flex-wrap items-center gap-3 md:gap-6",
+    isStandalone ? "md:justify-end" : "md:justify-end"
+  );
+
+  const boardInteractiveWrapperClass = cn(
+    "flex items-center justify-center w-full",
+    isSpectator
+      ? "cursor-not-allowed pointer-events-none"
+      : "cursor-pointer pointer-events-auto"
+  );
+
+  const boardScaleClass = cn(
+    "transform origin-top transition-transform duration-200 ease-out",
+    "scale-[0.7] sm:scale-[0.85] md:scale-100"
+  );
+
+  const quickTipsClass = cn(
+    "z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg",
+    isStandalone
+      ? "fixed md:left-6 md:bottom-6 left-1/2 bottom-[5.5rem] md:transform-none -translate-x-1/2 md:-translate-x-0"
+      : "absolute md:left-6 md:bottom-6 left-1/2 bottom-[5.5rem] md:transform-none -translate-x-1/2 md:-translate-x-0",
+    "w-[min(90vw,18rem)] md:w-auto"
   );
   return (
     <div className={containerClass}>
       {showTopBar && (
         <div className={topBarClass}>
-          <div className="h-full px-6 flex items-center justify-between">
+          <div className={topBarContentClass}>
             {/* Logo/Title */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               <div className="text-3xl">♔</div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -265,10 +299,10 @@ export function GameView({
             </div>
 
             {/* Status & Realtime Info */}
-            <div className="flex items-center space-x-6">
+            <div className={topBarStatsClass}>
               {/* Connection Status - Only show for multiplayer */}
               {isMultiplayer && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   {connected ? (
                     <>
                       <Wifi className="h-4 w-4 text-green-500" />
@@ -289,7 +323,7 @@ export function GameView({
 
               {/* Players Count - Only show for multiplayer */}
               {isMultiplayer && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-blue-500" />
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                     {players.length}/2 ผู้เล่น
@@ -298,7 +332,7 @@ export function GameView({
               )}
 
               {/* Game Status */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Crown className="h-5 w-5 text-yellow-500" />
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   ตาของ:
@@ -322,34 +356,24 @@ export function GameView({
 
       {/* Game Board - Centered */}
       <div className={boardWrapperClass}>
-        <div
-          className={cn(
-            "flex items-center justify-center",
-            isSpectator
-              ? "cursor-not-allowed pointer-events-none"
-              : "cursor-pointer pointer-events-auto"
-          )}
-        >
-          <MakrukBoard
-            onMove={isMultiplayer ? handlePlayerMove : undefined}
-            myColor={myColor}
-          />
+        <div className="w-full max-w-full overflow-x-visible">
+          <div className={boardInteractiveWrapperClass}>
+            <div className={boardScaleClass}>
+              <MakrukBoard
+                onMove={isMultiplayer ? handlePlayerMove : undefined}
+                myColor={myColor}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* HUD Controls */}
-      <GameHUD />
+      <GameHUD layout={layout} />
 
       {/* Quick Instructions - Bottom Left */}
       {showQuickTips && (
-        <div
-          className={cn(
-            "z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg max-w-xs",
-            layout === "standalone"
-              ? "fixed bottom-6 left-6"
-              : "absolute bottom-6 left-6"
-          )}
-        >
+        <div className={quickTipsClass}>
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
             💡 คำแนะนำ
           </h3>

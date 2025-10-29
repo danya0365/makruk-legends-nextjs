@@ -2,14 +2,23 @@
 
 import { useGameStore } from "@/src/presentation/stores/gameStore";
 import { Info, History, Settings, Trophy } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { HUDPanel, HUDPanelToggle } from "../layout/HUDPanel";
 import { GameInfoContent } from "./GameInfoContent";
 import { GameHistoryContent } from "./GameHistoryContent";
 
-export function GameHUD() {
+interface GameHUDProps {
+  layout?: "standalone" | "embedded";
+}
+
+export function GameHUD({ layout = "standalone" }: GameHUDProps) {
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const { status, result, moveHistory } = useGameStore();
+
+  const controlsPositionClass = useMemo(
+    () => (layout === "standalone" ? "fixed bottom-6 right-6" : "absolute bottom-6 right-6"),
+    [layout]
+  );
 
   const togglePanel = (panelName: string) => {
     setActivePanel(activePanel === panelName ? null : panelName);
@@ -18,7 +27,7 @@ export function GameHUD() {
   return (
     <>
       {/* HUD Controls - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
+      <div className={`${controlsPositionClass} z-30 flex flex-col gap-3`}>
         <HUDPanelToggle
           icon={<Info className="h-6 w-6" />}
           label="ข้อมูล"

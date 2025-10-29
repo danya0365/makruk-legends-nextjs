@@ -4,11 +4,11 @@ import { GameConfig } from "@/src/domain/types/game.types";
 import { supabaseClient } from "@/src/infrastructure/supabase/client";
 import { useRealtimeGame } from "@/src/presentation/hooks/useRealtimeGame";
 import { useGameStore } from "@/src/presentation/stores/gameStore";
+import { cn } from "@/src/utils/cn";
 import { Crown, Users, Wifi, WifiOff } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { GameHUD } from "./GameHUD";
 import { MakrukBoard } from "./MakrukBoard";
-import { cn } from "@/src/utils/cn";
 
 interface GameViewProps {
   roomId?: string;
@@ -16,6 +16,18 @@ interface GameViewProps {
   playerName?: string;
   myColor?: "white" | "black" | null;
   config?: GameConfig;
+  /**
+   * เลือก layout ของ GameView
+   * - standalone: ใช้เต็มหน้าจอพร้อม top bar ภายในตัวเอง
+   * - embedded: ใช้เป็นส่วนหนึ่งของหน้าจออื่น (เช่น RoomGameView)
+   */
+  layout?: "standalone" | "embedded";
+  /** ซ่อน/แสดง top bar ด้านบน */
+  showTopBar?: boolean;
+  /** ซ่อน/แสดง quick tips มุมล่างซ้าย */
+  showQuickTips?: boolean;
+  /** กำหนด className เพิ่มเติมให้ container หลัก */
+  className?: string;
 }
 
 export function GameView({
@@ -24,6 +36,10 @@ export function GameView({
   playerName,
   myColor,
   config,
+  layout = "standalone",
+  showTopBar = true,
+  showQuickTips = true,
+  className,
 }: GameViewProps) {
   const { initializeGame, currentTurn, status, applyOpponentMove } =
     useGameStore();
@@ -215,88 +231,97 @@ export function GameView({
     console.error("Realtime error:", error);
   }
 
-  const getStatusText = () => {
-    if (status === "playing") {
-      return currentTurn === "white" ? "ตาขาว" : "ตาดำ";
-    }
-    return "รอเริ่มเกม";
-  };
+  const containerClass = cn(
+    "flex flex-col w-full bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden",
+    layout === "standalone" ? "absolute inset-0" : "relative h-full min-h-full",
+    className
+  );
 
+  const topBarClass = cn(
+    "left-0 right-0 h-16 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-20",
+    layout === "standalone" ? "absolute top-0" : "relative w-full"
+  );
+
+  const boardWrapperClass = cn(
+    "flex flex-1 items-center justify-center",
+    layout === "standalone" && showTopBar ? "pt-16 pb-4" : "py-4"
+  );
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
-      {/* Top Bar */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 z-20">
-        <div className="h-full px-6 flex items-center justify-between">
-          {/* Logo/Title */}
-          <div className="flex items-center space-x-3">
-            <div className="text-3xl">♔</div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                หมากรุกไทย
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Makruk - Thai Chess
-              </p>
-            </div>
-          </div>
-
-          {/* Status & Realtime Info */}
-          <div className="flex items-center space-x-6">
-            {/* Connection Status - Only show for multiplayer */}
-            {isMultiplayer && (
-              <div className="flex items-center space-x-2">
-                {connected ? (
-                  <>
-                    <Wifi className="h-4 w-4 text-green-500" />
-                    <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                      เชื่อมต่อแล้ว
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <WifiOff className="h-4 w-4 text-red-500" />
-                    <span className="text-xs font-medium text-red-600 dark:text-red-400">
-                      {loading ? "กำลังเชื่อมต่อ..." : "ไม่ได้เชื่อมต่อ"}
-                    </span>
-                  </>
-                )}
+    <div className={containerClass}>
+      {showTopBar && (
+        <div className={topBarClass}>
+          <div className="h-full px-6 flex items-center justify-between">
+            {/* Logo/Title */}
+            <div className="flex items-center space-x-3">
+              <div className="text-3xl">♔</div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                  หมากรุกไทย
+                </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Makruk - Thai Chess
+                </p>
               </div>
-            )}
+            </div>
 
-            {/* Players Count - Only show for multiplayer */}
-            {isMultiplayer && (
+            {/* Status & Realtime Info */}
+            <div className="flex items-center space-x-6">
+              {/* Connection Status - Only show for multiplayer */}
+              {isMultiplayer && (
+                <div className="flex items-center space-x-2">
+                  {connected ? (
+                    <>
+                      <Wifi className="h-4 w-4 text-green-500" />
+                      <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                        เชื่อมต่อแล้ว
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <WifiOff className="h-4 w-4 text-red-500" />
+                      <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                        {loading ? "กำลังเชื่อมต่อ..." : "ไม่ได้เชื่อมต่อ"}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Players Count - Only show for multiplayer */}
+              {isMultiplayer && (
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4 text-blue-500" />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {players.length}/2 ผู้เล่น
+                  </span>
+                </div>
+              )}
+
+              {/* Game Status */}
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-blue-500" />
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  {players.length}/2 ผู้เล่น
+                <Crown className="h-5 w-5 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  ตาของ:
+                </span>
+                <span
+                  className={`text-lg font-bold ${
+                    status === "playing"
+                      ? currentTurn === "white"
+                        ? "text-gray-900 dark:text-white"
+                        : "text-gray-700 dark:text-gray-300"
+                      : "text-gray-500"
+                  } ${status === "playing" ? "animate-pulse" : ""}`}
+                >
+                  {currentTurn === "white" ? "⚪" : "⚫"}
                 </span>
               </div>
-            )}
-
-            {/* Game Status */}
-            <div className="flex items-center space-x-2">
-              <Crown className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                ตาของ:
-              </span>
-              <span
-                className={`text-lg font-bold ${
-                  status === "playing"
-                    ? currentTurn === "white"
-                      ? "text-gray-900 dark:text-white"
-                      : "text-gray-700 dark:text-gray-300"
-                    : "text-gray-500"
-                } ${status === "playing" ? "animate-pulse" : ""}`}
-              >
-                {currentTurn === "white" ? "⚪" : "⚫"}
-              </span>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Game Board - Centered */}
-      <div className="absolute inset-0 flex items-center justify-center pt-16 pb-4">
+      <div className={boardWrapperClass}>
         <div
           className={cn(
             "flex items-center justify-center",
@@ -316,16 +341,25 @@ export function GameView({
       <GameHUD />
 
       {/* Quick Instructions - Bottom Left */}
-      <div className="fixed bottom-6 left-6 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg max-w-xs">
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
-          💡 คำแนะนำ
-        </h3>
-        <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-          <p>• คลิกหมากเพื่อเลือก</p>
-          <p>• ช่องเขียว = เดินได้</p>
-          <p>• คลิกไอคอนด้านขวาเพื่อดูข้อมูล</p>
+      {showQuickTips && (
+        <div
+          className={cn(
+            "z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-lg max-w-xs",
+            layout === "standalone"
+              ? "fixed bottom-6 left-6"
+              : "absolute bottom-6 left-6"
+          )}
+        >
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
+            💡 คำแนะนำ
+          </h3>
+          <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+            <p>• คลิกหมากเพื่อเลือก</p>
+            <p>• ช่องเขียว = เดินได้</p>
+            <p>• คลิกไอคอนด้านขวาเพื่อดูข้อมูล</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -239,9 +239,14 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
     const effectiveColor = isSpectator ? null : myColor;
 
     return (
-      <>
+      <div
+        className={cn(
+          "relative min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden",
+          "flex items-center justify-center flex-col w-full"
+        )}
+      >
         {/* Room Info Bar */}
-        <div className="fixed top-16 left-0 right-0 h-12 bg-blue-600 text-white z-30 flex items-center justify-between px-6">
+        <div className="flex-none w-full flex items-center justify-between px-6 h-12 bg-blue-600 text-white shadow-lg">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
@@ -272,15 +277,33 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
           </button>
         </div>
 
+        {/* Game View area */}
+        <div className="relative flex-1 w-full flex flex-col items-center justify-center bg-amber-800">
+          <GameView
+            roomId={roomId}
+            playerId={effectivePlayerId}
+            playerName={effectivePlayerName}
+            myColor={effectiveColor}
+            config={{
+              timeControl: gameRoom?.time_control || "10+0",
+              mode: "online",
+            }}
+            layout="embedded"
+            showTopBar={true}
+            showQuickTips={!isSpectator}
+            className="w-full flex-1"
+          />
+        </div>
+
         {/* Connection Status */}
         {!connected && (
-          <div className="absolute top-28 right-6 px-4 py-2 bg-yellow-500 text-yellow-900 rounded-lg shadow-lg text-sm font-medium animate-pulse">
+          <div className="absolute top-36 right-6 z-20 px-4 py-2 bg-yellow-500 text-yellow-900 rounded-lg shadow-lg text-sm font-medium animate-pulse">
             ⚠️ กำลังเชื่อมต่อ...
           </div>
         )}
 
         {/* Players Info */}
-        <div className="absolute top-28 left-6 space-y-2 z-40">
+        <div className="absolute top-36 left-6 space-y-2 z-20">
           {/* Players Count */}
           <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm">
             <div className="flex items-center space-x-2">
@@ -334,28 +357,7 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
             </div>
           )}
         </div>
-
-        {/* Game View with offset */}
-        <div
-          className={cn(
-            "fixed inset-0 pt-12",
-            isSpectator
-              ? "cursor-not-allowed pointer-events-none"
-              : "cursor-pointer pointer-events-auto"
-          )}
-        >
-          <GameView
-            roomId={roomId}
-            playerId={effectivePlayerId}
-            playerName={effectivePlayerName}
-            myColor={effectiveColor}
-            config={{
-              timeControl: gameRoom?.time_control || "10+0",
-              mode: "online",
-            }}
-          />
-        </div>
-      </>
+      </div>
     );
   }
 

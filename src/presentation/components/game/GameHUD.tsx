@@ -1,11 +1,11 @@
 "use client";
 
 import { useGameStore } from "@/src/presentation/stores/gameStore";
-import { Info, History, Settings, Trophy } from "lucide-react";
+import { History, Info, Settings, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { HUDPanel, HUDPanelToggle } from "../layout/HUDPanel";
-import { GameInfoContent } from "./GameInfoContent";
 import { GameHistoryContent } from "./GameHistoryContent";
+import { GameInfoContent } from "./GameInfoContent";
 
 interface GameHUDProps {
   layout?: "standalone" | "embedded";
@@ -16,7 +16,10 @@ export function GameHUD({ layout = "standalone" }: GameHUDProps) {
   const { status, result, moveHistory } = useGameStore();
 
   const controlsPositionClass = useMemo(
-    () => (layout === "standalone" ? "fixed bottom-6 right-6" : "absolute bottom-6 right-6"),
+    () =>
+      layout === "standalone"
+        ? "fixed bottom-6 right-6"
+        : "absolute bottom-6 right-6",
     [layout]
   );
 
@@ -128,7 +131,9 @@ export function GameHUD({ layout = "standalone" }: GameHUDProps) {
               </button>
               <button
                 onClick={() => {
-                  useGameStore.getState().resignGame(useGameStore.getState().currentTurn);
+                  useGameStore
+                    .getState()
+                    .resignGame(useGameStore.getState().currentTurn);
                   setActivePanel(null);
                 }}
                 className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"

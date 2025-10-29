@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Copy, Check, Users, Link as LinkIcon, Crown, AlertCircle } from "lucide-react";
 import { GameView } from "./GameView";
 import { useRealtimeGame } from "@/src/presentation/hooks/useRealtimeGame";
+import { cn } from "@/src/utils/cn";
 
 interface RoomGameViewProps {
   roomId: string;
@@ -263,7 +264,10 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
           <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm">
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4 text-blue-600" />
-              <span className="font-semibold">{players.length}/2 ผู้เล่น</span>
+              <span className="font-semibold">
+                {Math.min(players.length, 2)}/2 ผู้เล่น
+                {players.length > 2 && ` • ผู้ชม ${players.length - 2}`}
+              </span>
             </div>
           </div>
 
@@ -279,13 +283,18 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
               <span className="font-medium">
                 {players.length > 1 
                   ? players.find(p => p.id !== gameRoom?.host_id)?.name || playerName
-                  : !isHost ? playerName : "รอผู้เล่น..."}
+                  : !isHost && !isSpectator ? playerName : "รอผู้เล่น..."}
               </span>
-              {!isHost && <span className="text-xs">(คุณ)</span>}
+              {!isHost && !isSpectator && <span className="text-xs">(คุณ)</span>}
+              {isSpectator && <span className="text-xs text-blue-500">(ผู้ชม)</span>}
             </div>
             <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
               <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
-                คุณเล่นเป็น: {isHost ? "⚪ ขาว (เดินก่อน)" : "⚫ ดำ (เดินทีสอง)"}
+                {isSpectator
+                  ? "คุณกำลังชมเกม (เดินหมากไม่ได้)"
+                  : isHost
+                    ? "คุณเล่นเป็น: ⚪ ขาว (เดินก่อน)"
+                    : "คุณเล่นเป็น: ⚫ ดำ (เดินทีสอง)"}
               </span>
             </div>
           </div>
@@ -297,7 +306,14 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
         </div>
 
         {/* Game View with offset */}
-        <div className="pt-12">
+        <div
+          className={cn(
+            "pt-12",
+            isSpectator
+              ? "cursor-not-allowed pointer-events-none"
+              : "cursor-pointer pointer-events-auto"
+          )}
+        >
           <GameView
             roomId={roomId}
             playerId={effectivePlayerId}

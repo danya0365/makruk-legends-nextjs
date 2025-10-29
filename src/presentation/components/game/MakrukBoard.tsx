@@ -28,12 +28,17 @@ export function MakrukBoard({ onMove, myColor }: MakrukBoardProps = {}) {
     const piece = board[row][col];
     const clickedPosition: Position = { row, col };
 
-    // TURN LOCK: If myColor is set (multiplayer), only allow moves on YOUR turn
-    const isMyTurn = !myColor || currentTurn === myColor;
-    
+    const isSpectator = myColor === null;
+    // TURN LOCK: Spectators cannot move. If myColor undefined (local play), allow.
+    const isMyTurn = isSpectator ? false : myColor ? currentTurn === myColor : true;
+
     // Early return if not your turn
     if (!isMyTurn) {
-      console.log(`⛔ Not your turn! Current: ${currentTurn}, You: ${myColor}`);
+      if (isSpectator) {
+        console.log("👀 Spectator mode: moves disabled");
+      } else {
+        console.log(`⛔ Not your turn! Current: ${currentTurn}, You: ${myColor}`);
+      }
       return;
     }
 

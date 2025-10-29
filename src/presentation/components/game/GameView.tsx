@@ -8,6 +8,7 @@ import { Crown, Users, Wifi, WifiOff } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
 import { GameHUD } from "./GameHUD";
 import { MakrukBoard } from "./MakrukBoard";
+import { cn } from "@/src/utils/cn";
 
 interface GameViewProps {
   roomId?: string;
@@ -34,6 +35,7 @@ export function GameView({
 
   // Use realtime hook only for multiplayer (when roomId exists)
   const isMultiplayer = !!roomId && !!playerId && !!playerName;
+  const isSpectator = myColor === null;
 
   // Always call hook (React rule) but use dummy values for local play
   const {
@@ -295,7 +297,14 @@ export function GameView({
 
       {/* Game Board - Centered */}
       <div className="absolute inset-0 flex items-center justify-center pt-16 pb-4">
-        <div className="flex items-center justify-center">
+        <div
+          className={cn(
+            "flex items-center justify-center",
+            isSpectator
+              ? "cursor-not-allowed pointer-events-none"
+              : "cursor-pointer pointer-events-auto"
+          )}
+        >
           <MakrukBoard
             onMove={isMultiplayer ? handlePlayerMove : undefined}
             myColor={myColor}

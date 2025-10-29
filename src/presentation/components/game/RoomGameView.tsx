@@ -1,11 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, Check, Users, Link as LinkIcon, Crown, AlertCircle } from "lucide-react";
-import { GameView } from "./GameView";
 import { useRealtimeGame } from "@/src/presentation/hooks/useRealtimeGame";
 import { cn } from "@/src/utils/cn";
+import {
+  AlertCircle,
+  Check,
+  Copy,
+  Crown,
+  Link as LinkIcon,
+  Users,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { GameView } from "./GameView";
 
 interface RoomGameViewProps {
   roomId: string;
@@ -43,14 +50,17 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
       setShowJoinForm(false);
 
       // Store player info
-      localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
-        id: hostId,
-        name: decodedHostName,
-        isHost: true,
-        role: "host",
-        color: "white",
-        timeControl,
-      }));
+      localStorage.setItem(
+        `room_${roomId}_player`,
+        JSON.stringify({
+          id: hostId,
+          name: decodedHostName,
+          isHost: true,
+          role: "host",
+          color: "white",
+          timeControl,
+        })
+      );
     } else {
       // Try to load from localStorage
       const stored = localStorage.getItem(`room_${roomId}_player`);
@@ -101,8 +111,9 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
 
   // Initialize Realtime (use stable IDs to prevent re-initialization)
   const stablePlayerId = playerId || "temp_guest";
-  const stablePlayerName = playerId && role !== "spectator" ? playerName : "Guest";
-  
+  const stablePlayerName =
+    playerId && role !== "spectator" ? playerName : "Guest";
+
   const {
     connected,
     loading: realtimeLoading,
@@ -136,15 +147,18 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
 
     if (gameRoom.guest_id) {
       setRole("spectator");
-      setSpectatorMessage("ผู้เล่นทั้งสองฝั่งกำลังเล่นอยู่ คุณสามารถรับชมเกมได้แบบเรียลไทม์");
+      setSpectatorMessage(
+        "ผู้เล่นทั้งสองฝั่งกำลังเล่นอยู่ คุณสามารถรับชมเกมได้แบบเรียลไทม์"
+      );
       setMyColor(null);
       return;
     }
   }, [gameRoom, playerId]);
 
-  const roomUrl = typeof window !== "undefined" 
-    ? `${window.location.origin}/game/room/${roomId}`
-    : "";
+  const roomUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/game/room/${roomId}`
+      : "";
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(roomUrl);
@@ -172,7 +186,9 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
         setRole("spectator");
         setPlayerId(spectatorId);
         setMyColor(null);
-        setSpectatorMessage("ผู้เล่นทั้งสองฝั่งถูกจับจองแล้ว คุณกำลังชมเป็นผู้สังเกตการณ์");
+        setSpectatorMessage(
+          "ผู้เล่นทั้งสองฝั่งถูกจับจองแล้ว คุณกำลังชมเป็นผู้สังเกตการณ์"
+        );
         localStorage.setItem(
           `room_${roomId}_player`,
           JSON.stringify({
@@ -193,14 +209,17 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
       setSpectatorMessage(null);
 
       // Store player info
-      localStorage.setItem(`room_${roomId}_player`, JSON.stringify({
-        id: guestId,
-        name: playerName,
-        isHost: false,
-        role: "guest",
-        color: playerColor,
-        joinedAt: new Date().toISOString(),
-      }));
+      localStorage.setItem(
+        `room_${roomId}_player`,
+        JSON.stringify({
+          id: guestId,
+          name: playerName,
+          isHost: false,
+          role: "guest",
+          color: playerColor,
+          joinedAt: new Date().toISOString(),
+        })
+      );
 
       console.log(`✅ Guest joined as BLACK: ${playerName} (${guestId})`);
       setShowJoinForm(false);
@@ -214,7 +233,9 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
   if (!showJoinForm) {
     const isSpectator = role === "spectator";
     const effectivePlayerId = isSpectator ? "spectator" : playerId;
-    const effectivePlayerName = isSpectator ? playerName || "Spectator" : playerName;
+    const effectivePlayerName = isSpectator
+      ? playerName || "Spectator"
+      : playerName;
     const effectiveColor = isSpectator ? null : myColor;
 
     return (
@@ -275,26 +296,35 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
           <div className="px-4 py-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-sm space-y-2">
             <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
               <span className="font-semibold">⚪ ขาว:</span>
-              <span className="font-medium">{gameRoom?.host_name || "Host"}</span>
+              <span className="font-medium">
+                {gameRoom?.host_name || "Host"}
+              </span>
               {isHost && <Crown className="h-3 w-3 text-yellow-500" />}
             </div>
             <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
               <span className="font-semibold">⚫ ดำ:</span>
               <span className="font-medium">
-                {players.length > 1 
-                  ? players.find(p => p.id !== gameRoom?.host_id)?.name || playerName
-                  : !isHost && !isSpectator ? playerName : "รอผู้เล่น..."}
+                {players.length > 1
+                  ? players.find((p) => p.id !== gameRoom?.host_id)?.name ||
+                    playerName
+                  : !isHost && !isSpectator
+                  ? playerName
+                  : "รอผู้เล่น..."}
               </span>
-              {!isHost && !isSpectator && <span className="text-xs">(คุณ)</span>}
-              {isSpectator && <span className="text-xs text-blue-500">(ผู้ชม)</span>}
+              {!isHost && !isSpectator && (
+                <span className="text-xs">(คุณ)</span>
+              )}
+              {isSpectator && (
+                <span className="text-xs text-blue-500">(ผู้ชม)</span>
+              )}
             </div>
             <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700">
               <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
                 {isSpectator
                   ? "คุณกำลังชมเกม (เดินหมากไม่ได้)"
                   : isHost
-                    ? "คุณเล่นเป็น: ⚪ ขาว (เดินก่อน)"
-                    : "คุณเล่นเป็น: ⚫ ดำ (เดินทีสอง)"}
+                  ? "คุณเล่นเป็น: ⚪ ขาว (เดินก่อน)"
+                  : "คุณเล่นเป็น: ⚫ ดำ (เดินทีสอง)"}
               </span>
             </div>
           </div>
@@ -308,7 +338,7 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
         {/* Game View with offset */}
         <div
           className={cn(
-            "pt-12",
+            "fixed inset-0 pt-12",
             isSpectator
               ? "cursor-not-allowed pointer-events-none"
               : "cursor-pointer pointer-events-auto"
@@ -362,7 +392,9 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
             /* Loading Room */
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">กำลังโหลดห้องเกม...</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                กำลังโหลดห้องเกม...
+              </p>
             </div>
           ) : realtimeError || !gameRoom ? (
             /* Room Not Found */
@@ -412,7 +444,9 @@ export function RoomGameView({ roomId }: RoomGameViewProps) {
                       ระยะเวลา
                     </p>
                     <p className="text-xl font-bold text-gray-900 dark:text-white">
-                      {gameRoom.time_control === "unlimited" ? "♾️ ไม่จำกัด" : `⏱️ ${gameRoom.time_control}`}
+                      {gameRoom.time_control === "unlimited"
+                        ? "♾️ ไม่จำกัด"
+                        : `⏱️ ${gameRoom.time_control}`}
                     </p>
                   </div>
                 </div>

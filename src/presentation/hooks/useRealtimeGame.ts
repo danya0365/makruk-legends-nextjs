@@ -82,7 +82,9 @@ export function useRealtimeGame({
   const [connectionKey, setConnectionKey] = useState(0);
 
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   // Load initial game room data
   const loadGameRoom = useCallback(async () => {
